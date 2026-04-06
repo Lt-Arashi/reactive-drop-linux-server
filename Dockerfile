@@ -2,7 +2,7 @@ FROM debian:bookworm-slim AS proton
 
 # ============================[ SETUP ] =======================
 ENV DEBIAN_FRONTEND="noninteractive"
-ENV PROTON="https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton9-22/GE-Proton9-22.tar.gz"
+ENV PROTON="https://ghproxy.net/https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton9-22/GE-Proton9-22.tar.gz"
 
 # working directory
 WORKDIR /opt
@@ -17,7 +17,9 @@ RUN wget -qO- "${PROTON}" | tar xvz -C /opt
 RUN dpkg --add-architecture i386
 
 # steam
-RUN sed -i'' 's/main/main contrib non-free/g' /etc/apt/sources.list.d/debian.sources
+RUN sed -i 's|http://deb.debian.org/debian|https://mirrors.tuna.tsinghua.edu.cn/debian|g' /etc/apt/sources.list.d/debian.sources \
+ && sed -i 's|http://security.debian.org/debian-security|https://mirrors.tuna.tsinghua.edu.cn/debian-security|g' /etc/apt/sources.list.d/debian.sources \
+ && sed -i 's/main/main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
 RUN echo steam steam/question select "I AGREE" | debconf-set-selections
 RUN echo steam steam/license note '' | debconf-set-selections
 RUN apt update && apt -y install steamcmd
