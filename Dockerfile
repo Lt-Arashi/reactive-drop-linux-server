@@ -46,6 +46,9 @@ RUN mkdir -p /opt/bin && find /opt -type f -name 'wine' -exec ln -sf {} /opt/bin
 
 # locales
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+RUN sed -i '/zh_CN.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+ENV LANG=zh_CN.UTF-8
+ENV LC_ALL=zh_CN.UTF-8
 
 
 

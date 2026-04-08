@@ -1,35 +1,17 @@
-# project
-Reactive Drop linux server
+# 更适合中国宝宝体制的Reactive Drop linux server
 
-# what does it run on
-This container does not require a Windows installation to run. It runs on windows, linux, macosx, without gui.
 
-# it seems not updated recently
+### 为什么这个更适合我？
+* 主分支多数使用了官方原,这对我们的网络情况不是很友好
 
-That is because the software auto-updates on start. There are just no bugs reported or found that require an update.
+### 如何使用?
+* 要使服务器运行正常,你需要一台运行Linux系统的服务器
+* 在使用本自动化部署前,你需要先安装Docker
 
-# requirements
-You need Docker
 
-About Docker:
-- https://www.docker.com/resources/what-container
-- https://www.docker.com/products/docker-enterprise
+### 步骤
+声明:我并不是专业人士,我只能确保以下步骤在我的Ubuntu22.04上运行良好,相关命令均来自于网络,总之没一个是我自己想的
 
-Get Docker:
-- https://www.docker.com/get-started
-- https://docs.docker.com/compose/
+* 安装`Docker`
 
-Install Docker and Docker-Compose.
 
-# how to run
-
-Download `docker-compose.yml`, make your changes, and run `docker-compose up`. 
-
-# winesync
-
-The container optionally supports WineSync, if you have a kernel that supports it.
-
-# how to customize
-The game is installed in a volume `/usr/lib/games/reactivedrop/`, you can mount that volume on the host.
-
-Any configuration parameters starting with `rd_` with be written as config, i.e. `rd_rcon_password=test` will be `rcon_password test` in the server config.

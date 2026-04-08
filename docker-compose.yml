@@ -8,34 +8,120 @@ services:
     environment:
       # startup variables
       - "port=27050"
-      - "maxplayers=4"
+      - "maxplayers=16"
       - "wine_fastsync=1" # enable this if you have a winesync enabled kernel, ie xanmod
 
-      # below variables will be written as server config
-      # in example, rd_rcon_password becomes rcon_password
-      - "rd_hostname=Reactive Drop Linux server"
-      - "rd_rcon_password=swarmtest"
+      # 这里可以写服务器控制台变量
+      # 比如, rd_rcon_password 就是 rcon_password
+      #- "rd_hostname=[CN猫猫大豪斯] HspAF 测试 Linux Server"
+      - "rd_rcon_password=HspAFrd1"
 
-      # place workshop items here (these are just examples)
+      # 创意工坊可以写在这里,自己写workshop貌似会出问题,如果你新加了项目,你需要关闭docker重新加载该文件来应用
       - "workshop_item_910871185=enable" # better hug
       - "workshop_item_921573337=enable" # better chat
-
+      # Rankserver challenge and map
+      - "workshop_item_848260335=enable"
+      - "workshop_item_848331447=enable"
+      - "workshop_item_861497042=enable"
+      - "workshop_item_880002363=enable"
+      - "workshop_item_909702841=enable"
+      - "workshop_item_912391147=enable"
+      - "workshop_item_914421802=enable"
+      - "workshop_item_915370759=enable"
+      - "workshop_item_918455573=enable"
+      - "workshop_item_921199337=enable"
+      - "workshop_item_930171604=enable"
+      - "workshop_item_935549703=enable"
+      - "workshop_item_935767408=enable"
+      - "workshop_item_936092737=enable"
+      - "workshop_item_936101427=enable"
+      - "workshop_item_937399666=enable"
+      - "workshop_item_937405470=enable"
+      - "workshop_item_1093180806=enable"
+      - "workshop_item_1098363725=enable"
+      - "workshop_item_1109961848=enable"
+      - "workshop_item_1118193931=enable"
+      - "workshop_item_1167497265=enable"
+      - "workshop_item_1297056081=enable"
+      - "workshop_item_1312255876=enable"
+      - "workshop_item_1313628775=enable"
+      - "workshop_item_1333152091=enable"
+      - "workshop_item_1366599495=enable"
+      - "workshop_item_1374886583=enable"
+      - "workshop_item_1447743649=enable"
+      - "workshop_item_1448547351=enable"
+      - "workshop_item_1448556629=enable"
+      - "workshop_item_1517302956=enable"
+      - "workshop_item_1519884777=enable"
+      - "workshop_item_1551965583=enable"
+      - "workshop_item_1584605820=enable"
+      - "workshop_item_1614683161=enable"
+      - "workshop_item_1664826545=enable"
+      - "workshop_item_1690620315=enable"
+      - "workshop_item_1757080639=enable"
+      - "workshop_item_1768656061=enable"
+      - "workshop_item_1846586064=enable"
+      - "workshop_item_1908746680=enable"
+      - "workshop_item_2070196148=enable"
+      - "workshop_item_2178770089=enable"
+      - "workshop_item_2225112897=enable"
+      - "workshop_item_2289630826=enable"
+      - "workshop_item_2326134727=enable"
+      - "workshop_item_2461568606=enable"
+      - "workshop_item_2584775431=enable"
+      - "workshop_item_2592381597=enable"
+      - "workshop_item_2809765323=enable"
+      - "workshop_item_2811007850=enable"
+      - "workshop_item_2821100493=enable"
+      - "workshop_item_2885875069=enable"
+      - "workshop_item_2916269416=enable"
+      - "workshop_item_2921394571=enable"
+      - "workshop_item_2946879059=enable"
+      - "workshop_item_2953250066=enable"
+      - "workshop_item_2966183425=enable"
+      - "workshop_item_2979008182=enable"
+      - "workshop_item_2985633068=enable"
+      - "workshop_item_2990264624=enable"
+      - "workshop_item_3027355897=enable"
+      - "workshop_item_3142399089=enable"
+      - "workshop_item_3236503229=enable"
+      # Other challenge and map
+      - "workshop_item_1429436524=enable" # SNP ASBI
+      - "workshop_item_2912996796=enable" # Rush
+      - "workshop_item_3258091500=enable" # WB2
+      - "workshop_item_3322216456=enable" # meme wb+hordes
+      - "workshop_item_1249793308=enable" # Dark survival
+      - "workshop_item_3322397868=enable" # MEME C5
+      - "workshop_item_1125436820=enable" # SNP
+      - "workshop_item_3412226113=enable" # 盾酱奇妙冒险
+      - "workshop_item_1626396865=enable" #kill them all
+      - "workshop_item_913021935=enable"  # MAP Training Range  
+      - "workshop_item_1614683161=enable" # MAP L4D2: Dark Carnival
+      - "workshop_item_3674338292=enable" # STAR JUJUTSU
+      - "workshop_item_3671280607=enable" #MAP L4D2: Swamp Fever
 
     networks:
       - network
     ports:
-      # these ports need to be forwarded in your router
-      # use the same port as mentioned further above in this config
+      # 启动端口,请于上方的port一致
       - "27050:27050/tcp"
       - "27050:27050/udp"
     volumes:
       # enable fast winesync (if available in kernel)
       - "/dev/winesync:/dev/winesync"
 
-      # this will download the game into <this folder>/reactivedrop in first use
-      # you can change any config file in the game folder you want after install
-      # please note, if there are game updates, any modified game files will be overwritten
+      # volumes功能为挂载,也就是说从从容器中映射出某个部分到宿主机，在宿主机内修改后会自动同步到容器内
+      # 如果游戏更新，可能做出的修改会被覆盖,注意备份
       - "./reactivedrop:/usr/lib/games/reactivedrop"
+
+      # 因为我的强迫症无法容忍崩溃的mdmp文件越攒越多,所以放弃了单独挂几个文件夹的想法
+      # - ./reactivedrop/cfg:/usr/lib/games/reactivedrop/reactivedrop/cfg"
+      # - ./reactivedrop/addons:/usr/lib/games/reactivedrop/reactivedrop/addons"
+      # - ./reactivedrop/scripts:/usr/lib/games/reactivedrop/reactivedrop/scripts"
+      # - ./reactivedrop/workshop:/usr/lib/games/reactivedrop/reactivedrop/workshop"
+      
+      # 挂entrypoint.sh方便日后修改启动项,以及注释检查服务端更新,加快重启
+      - ./entrypoint.sh:/entrypoint.sh
 
 networks:
   network:
