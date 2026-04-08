@@ -7,6 +7,8 @@
 ### 如何使用?
 * 一台运行Linux系统的服务器
 * 在使用本自动化部署前,你需要先安装Docker
+* 下载相关文件:`docker-compose.yml``Dockerfile``entrypoint.sh``settings.cfg``steam.dll`并放置到某个目录里
+* cd到`docker-compose.yml`所在的目录,运行`docker-compose up`即可
 
 ### 步骤
 * 声明:我并不是专业人士,我只能确保它在我的Ubuntu24.04上运行良好,相关命令均来自于网络,总之没一个是我自己想的
