@@ -45,7 +45,7 @@ ln -sf "${gamefolder}/steam_appid.txt" /opt/steam_appid.txt
 echo "writing settings.."
 
 # copy defaults settings to the game folder
-cp /usr/local/settings.cfg "${gamefolder}/reactivedrop/cfg/autoexec.cfg"
+# cp /usr/local/settings.cfg "${gamefolder}/reactivedrop/cfg/autoexec.cfg"
 
 # touch an empty workshop.cfg, since some users misinterprete the missing file message
 truncate -s 0 "${gamefolder}/reactivedrop/cfg/workshop.cfg"
