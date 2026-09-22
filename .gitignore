@@ -1,7 +1,9 @@
-.env*
+.env
 .idea/
 data
 docker-compose.override.yml
 export/
 reactivedrop/
 shared
+downloads/*
+!downloads/README.md

@@ -1,1 +1,11 @@
 .git
+.gitignore
+.github
+.env
+.idea
+data
+docker-compose.override.yml
+export/
+reactivedrop/
+shared
+plan.txt

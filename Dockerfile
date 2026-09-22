@@ -1,81 +1,59 @@
-FROM debian:bookworm-slim AS proton
-RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources
+FROM debian:bookworm-slim
 
-# ============================[ SETUP ] =======================
 ENV DEBIAN_FRONTEND="noninteractive"
-ENV PROTON="https://ghproxy.net/https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton9-22/GE-Proton9-22.tar.gz"
 
-# working directory
-WORKDIR /opt
+# 使用清华镜像源(含 steamcmd 所需的 non-free)
+# 注意用 http 而非 https: 基础镜像未装 ca-certificates, 用 https 会因缺少系统证书导致 apt update 失败
+# (先有鸡还是先有蛋的问题)。apt 的包本身靠 GPG 签名校验完整性, 走 http 是安全的。
+RUN sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g; s|main|main contrib non-free non-free-firmware|g' /etc/apt/sources.list.d/debian.sources \
+ && dpkg --add-architecture i386
 
-# ============================[ SYSTEM ] ===========================
-RUN --mount=type=cache,target=/var/lib/apt apt -qq update \
-  && apt -y install --no-install-recommends wget ca-certificates
+# 预置 steam 授权(必须在安装 steamcmd 之前), 先装 debconf 以支持预置
+RUN --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt/archives,sharing=locked \
+    apt -qq update \
+ && apt -y install --no-install-recommends ca-certificates debconf \
+ && echo steam steam/question select "I AGREE" | debconf-set-selections \
+ && echo steam steam/license note '' | debconf-set-selections
 
-RUN wget -qO- "${PROTON}" | tar xvz -C /opt
+# 系统依赖一次性装齐
+RUN --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt/archives,sharing=locked \
+    apt -qq update \
+ && apt -y install --no-install-recommends \
+      steamcmd \
+      libc6-i386 lib32gcc-s1 libnss-resolve:i386 \
+      libfreetype6:i386 libfontconfig1:i386 \
+      libfreetype6 libxft2 \
+      locales less procps vim-tiny boxes screen \
+      psmisc strace htop
 
-# i386
-RUN dpkg --add-architecture i386
+# Proton(本地下载: downloads/proton.tar.gz, 用 bind mount 避免写入镜像层以减小体积)
+RUN --mount=type=bind,source=downloads/proton.tar.gz,target=/tmp/proton.tar.gz \
+    tar xzf /tmp/proton.tar.gz -C /opt
 
-# steam
-RUN sed -i 's|http://deb.debian.org/debian|https://mirrors.tuna.tsinghua.edu.cn/debian|g' /etc/apt/sources.list.d/debian.sources \
- && sed -i 's|http://security.debian.org/debian-security|https://mirrors.tuna.tsinghua.edu.cn/debian-security|g' /etc/apt/sources.list.d/debian.sources \
- && sed -i 's/main/main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
-RUN echo steam steam/question select "I AGREE" | debconf-set-selections
-RUN echo steam steam/license note '' | debconf-set-selections
-RUN apt update && apt -y install steamcmd
-
-# wine packages
-RUN --mount=type=cache,target=/var/lib/apt apt -qq update \
-  && apt -y install --no-install-recommends \
-  libc6-i386 lib32gcc-s1 libnss-resolve:i386 \
-  libfreetype6:i386 libfontconfig1:i386 libnss-resolve:i386 \
-  libfreetype6 libxft2
-
-# other packages
-RUN --mount=type=cache,target=/var/lib/apt apt -qq update \
-  && apt -y install --no-install-recommends \
-  locales less procps vim-tiny boxes screen
-
-# expand paths to what proton is using
+# 展开 proton 用到的路径
 ENV LD_LIBRARY_PATH="/usr/lib/games/steam:/usr/lib/games/linux32"
 ENV PATH="/usr/lib/games/steam:/usr/lib/games/linux32:/opt/bin:$PATH"
 
-# link proton
+# 链接 wine 到 PATH
 RUN mkdir -p /opt/bin && find /opt -type f -name 'wine' -exec ln -sf {} /opt/bin/ \;
 
 # locales
-RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
-RUN sed -i '/zh_CN.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
+ && sed -i '/zh_CN.UTF-8/s/^# //g' /etc/locale.gen \
+ && locale-gen
 ENV LANG=zh_CN.UTF-8
 ENV LC_ALL=zh_CN.UTF-8
 
-
-
-
-# FROM mithrand0/linux-proton-steam:latest
-FROM proton
-
-RUN apt update; apt -y install psmisc strace htop
-
-# folders
-ENV STEAMFOLDER="/opt/steamcmd"
-ENV ADDONSFOLDER="/opt/template"
-
-# copy init script
+# 复制脚本与 steam.dll(游戏需要但不自带)
 COPY entrypoint.sh /
-COPY settings.cfg /usr/local/
-COPY steam.dll /usr/lib/games
+COPY steam.dll /usr/lib/games/
 
-# target
 ENV WINEARCH=win64
 ENV WINEDEBUG=-all
 
-# workdir
 VOLUME /usr/lib/games/reactivedrop
-
-# working directory
 WORKDIR /usr/lib/games/reactivedrop
 
-# entrypoint
 ENTRYPOINT [ "/entrypoint.sh" ]
