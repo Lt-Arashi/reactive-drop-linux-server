@@ -67,7 +67,6 @@ EOF
 fi
 
 echo "starting game.."
-truncate -s0 reactivedrop/console.log
 screen -S game -dm wine srcds_console.exe -console -condebug -game reactivedrop \
   -tickrate "${TICKRATE:-100}" \
   -ip 0.0.0.0 \
